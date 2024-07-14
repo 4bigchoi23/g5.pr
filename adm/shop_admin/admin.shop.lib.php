@@ -133,6 +133,8 @@ function pg_setting_check($is_print=false){
 			$pg_msg = 'LG유플러스';
 		} else if ( $default['de_pg_service'] === 'inicis' && $default['de_inicis_mid'] && $default['de_inicis_sign_key'] ){
 			$pg_msg = 'KG이니시스';
+		} else if ( $default['de_pg_service'] === 'nicepay' && $default['de_nicepay_mid'] && $default['de_nicepay_key'] ){
+			$pg_msg = 'NICEPAY';
 		}
 	}
 
@@ -154,6 +156,21 @@ function pg_setting_check($is_print=false){
 	} else{
 		return $msg;
 	}
+}
+
+function is_cancel_shop_pg_order($od){
+
+    $is_od_pg_cancel = false;
+
+    if (($od['od_settle_case'] == '신용카드' || $od['od_settle_case'] == '간편결제' || $od['od_settle_case'] == 'KAKAOPAY') || ($od['od_pg'] == 'inicis' && is_inicis_order_pay($od['od_settle_case']))) {
+        $is_od_pg_cancel = true;
+    }
+
+    if ($od['od_pg'] === 'nicepay' && in_array($od['od_settle_case'], array('계좌이체', '휴대폰'))) {
+        $is_od_pg_cancel = true;
+    }
+
+    return $is_od_pg_cancel;
 }
 
 function check_order_inicis_tmps(){

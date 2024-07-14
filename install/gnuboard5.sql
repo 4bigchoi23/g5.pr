@@ -189,6 +189,7 @@ CREATE TABLE IF NOT EXISTS `g5_board_new` (
 
 DROP TABLE IF EXISTS `g5_config`;
 CREATE TABLE IF NOT EXISTS `g5_config` (
+  `cf_id` int(11) NOT NULL auto_increment,
   `cf_title` varchar(255) NOT NULL DEFAULT '',
   `cf_theme` varchar(100) NOT NULL DEFAULT '',
   `cf_admin` varchar(100) NOT NULL DEFAULT '',
@@ -291,6 +292,7 @@ CREATE TABLE IF NOT EXISTS `g5_config` (
   `cf_cert_simple` varchar(255) NOT NULL DEFAULT '',
   `cf_cert_kg_cd` varchar(255) NOT NULL DEFAULT '',
   `cf_cert_kg_mid` varchar(255) NOT NULL DEFAULT '',
+  `cf_cert_use_seed` tinyint(4) NOT NULL DEFAULT '1',
   `cf_cert_kcb_cd` varchar(255) NOT NULL DEFAULT '',
   `cf_cert_kcp_cd` varchar(255) NOT NULL DEFAULT '',
   `cf_lg_mid` varchar(100) NOT NULL DEFAULT '',
@@ -342,7 +344,8 @@ CREATE TABLE IF NOT EXISTS `g5_config` (
   `cf_7` varchar(255) NOT NULL DEFAULT '',
   `cf_8` varchar(255) NOT NULL DEFAULT '',
   `cf_9` varchar(255) NOT NULL DEFAULT '',
-  `cf_10` varchar(255) NOT NULL DEFAULT ''
+  `cf_10` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY  (`cf_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -445,12 +448,14 @@ CREATE TABLE IF NOT EXISTS `g5_group_member` (
 
 DROP TABLE IF EXISTS `g5_login`;
 CREATE TABLE IF NOT EXISTS `g5_login` (
+  `lo_id` int(11) NOT NULL AUTO_INCREMENT,
   `lo_ip` varchar(100) NOT NULL default '',
   `mb_id` varchar(20) NOT NULL default '',
   `lo_datetime` datetime NOT NULL default '0000-00-00 00:00:00',
   `lo_location` text NOT NULL,
   `lo_url` text NOT NULL,
-  PRIMARY KEY  (`lo_ip`)
+  PRIMARY KEY (`lo_id`),
+  UNIQUE KEY `lo_ip_unique` (`lo_ip`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -679,7 +684,7 @@ CREATE TABLE IF NOT EXISTS `g5_scrap` (
 
 DROP TABLE IF EXISTS `g5_visit`;
 CREATE TABLE IF NOT EXISTS `g5_visit` (
-  `vi_id` int(11) NOT NULL default '0',
+  `vi_id` int(11) NOT NULL AUTO_INCREMENT,
   `vi_ip` varchar(100) NOT NULL default '',
   `vi_date` date NOT NULL default '0000-00-00',
   `vi_time` time NOT NULL default '00:00:00',
@@ -747,6 +752,7 @@ CREATE TABLE IF NOT EXISTS `g5_autosave` (
 
 DROP TABLE IF EXISTS `g5_qa_config`;
 CREATE TABLE IF NOT EXISTS `g5_qa_config` (
+  `qa_id` int(11) NOT NULL AUTO_INCREMENT,
   `qa_title` varchar(255) NOT NULL DEFAULT'',
   `qa_category` varchar(255) NOT NULL DEFAULT'',
   `qa_skin` varchar(255) NOT NULL DEFAULT '',
@@ -782,7 +788,8 @@ CREATE TABLE IF NOT EXISTS `g5_qa_config` (
   `qa_2` varchar(255) NOT NULL DEFAULT '',
   `qa_3` varchar(255) NOT NULL DEFAULT '',
   `qa_4` varchar(255) NOT NULL DEFAULT '',
-  `qa_5` varchar(255) NOT NULL DEFAULT ''
+  `qa_5` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`qa_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

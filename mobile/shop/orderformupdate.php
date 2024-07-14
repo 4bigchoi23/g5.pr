@@ -335,6 +335,11 @@ $order_price = $tot_od_price + $send_cost + $send_cost2 - $tot_sc_cp_price - $od
 
 $od_status = '주문';
 $od_tno    = '';
+
+if (function_exists('check_payment_method')) {
+    check_payment_method($od_settle_case);
+}
+
 if ($od_settle_case == "무통장")
 {
     $od_receipt_point   = $i_temp_point;
@@ -354,6 +359,9 @@ else if ($od_settle_case == "계좌이체")
             break;
         case 'inicis':
             include G5_MSHOP_PATH.'/inicis/pay_result.php';
+            break;
+        case 'nicepay':
+            include G5_MSHOP_PATH.'/nicepay/nicepay_result.php';
             break;
         default:
             include G5_MSHOP_PATH.'/kcp/pp_ax_hub.php';
@@ -381,6 +389,9 @@ else if ($od_settle_case == "가상계좌")
         case 'inicis':
             include G5_MSHOP_PATH.'/inicis/pay_result.php';
             break;
+        case 'nicepay':
+            include G5_MSHOP_PATH.'/nicepay/nicepay_result.php';
+            break;
         default:
             include G5_MSHOP_PATH.'/kcp/pp_ax_hub.php';
             $bankname   = iconv("cp949", "utf-8", $bankname);
@@ -407,6 +418,9 @@ else if ($od_settle_case == "휴대폰")
         case 'inicis':
             include G5_MSHOP_PATH.'/inicis/pay_result.php';
             break;
+        case 'nicepay':
+            include G5_MSHOP_PATH.'/nicepay/nicepay_result.php';
+            break;
         default:
             include G5_MSHOP_PATH.'/kcp/pp_ax_hub.php';
             break;
@@ -430,6 +444,9 @@ else if ($od_settle_case == "신용카드")
             break;
         case 'inicis':
             include G5_MSHOP_PATH.'/inicis/pay_result.php';
+            break;
+        case 'nicepay':
+            include G5_MSHOP_PATH.'/nicepay/nicepay_result.php';
             break;
         default:
             include G5_MSHOP_PATH.'/kcp/pp_ax_hub.php';
@@ -456,6 +473,9 @@ else if ($od_settle_case == "간편결제")
             break;
         case 'inicis':
             include G5_MSHOP_PATH.'/inicis/pay_result.php';
+            break;
+        case 'nicepay':
+            include G5_MSHOP_PATH.'/nicepay/nicepay_result.php';
             break;
         default:
             include G5_MSHOP_PATH.'/kcp/pp_ax_hub.php';
@@ -524,6 +544,10 @@ if($tno) {
                 break;
             case 'inicis':
                 include G5_SHOP_PATH.'/inicis/inipay_cancel.php';
+                break;
+            case 'nicepay':
+                $cancelAmt = (int)$pg_price;
+                include G5_SHOP_PATH.'/nicepay/cancel_process.php';
                 break;
             case 'KAKAOPAY':
                 $_REQUEST['TID']               = $tno;
@@ -838,7 +862,7 @@ if($config['cf_sms_use'] && ($default['de_sms_use2'] || $default['de_sms_use3'])
             $sms_content = str_replace("{보낸분}", $od_name, $sms_content);
             $sms_content = str_replace("{받는분}", $od_b_name, $sms_content);
             $sms_content = str_replace("{주문번호}", $od_id, $sms_content);
-            $sms_content = str_replace("{주문금액}", number_format($tot_ct_price + $od_send_cost + $od_send_cost2), $sms_content);
+            $sms_content = str_replace("{주문금액}", number_format($tot_ct_price + $od_send_cost + (int) $od_send_cost2), $sms_content);
             $sms_content = str_replace("{회원아이디}", $member['mb_id'], $sms_content);
             $sms_content = str_replace("{회사명}", $default['de_admin_company_name'], $sms_content);
 

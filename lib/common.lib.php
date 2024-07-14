@@ -102,6 +102,10 @@ function goto_url($url)
 {
     run_event('goto_url', $url);
 
+    if (function_exists('safe_filter_url_host')) {
+        $url = safe_filter_url_host($url);
+    }
+
     $url = str_replace("&amp;", "&", $url);
     //echo "<script> location.replace('$url'); </script>";
 
@@ -182,6 +186,10 @@ function alert($msg='', $url='', $error=true, $post=false)
 
     run_event('alert', $msg, $url, $error, $post);
 
+    if (function_exists('safe_filter_url_host')) {
+        $url = safe_filter_url_host($url);
+    }
+
     $msg = $msg ? strip_tags($msg, '<br>') : '올바른 방법으로 이용해 주십시오.';
 
     $header = '';
@@ -218,6 +226,12 @@ function confirm($msg, $url1='', $url2='', $url3='')
     if (!$msg) {
         $msg = '올바른 방법으로 이용해 주십시오.';
         alert($msg);
+    }
+
+    if (function_exists('safe_filter_url_host')) {
+        $url1 = safe_filter_url_host($url1);
+        $url2 = safe_filter_url_host($url2);
+        $url3 = safe_filter_url_host($url3);
     }
 
     if(!trim($url1) || !trim($url2)) {
@@ -712,7 +726,7 @@ function get_sql_search($search_ca_name, $search_field, $search_text, $search_op
     $tmp = explode(",", trim($search_field));
     $field = explode("||", $tmp[0]);
     $not_comment = "";
-    if (!empty($tmp[1]))
+    if (isset($tmp[1]))
         $not_comment = $tmp[1];
 
     $str .= "(";
@@ -768,8 +782,11 @@ function get_sql_search($search_ca_name, $search_field, $search_text, $search_op
         $op1 = " $search_operator ";
     }
     $str .= " ) ";
-    if ($not_comment)
+    if ($not_comment === '1') {
         $str .= " and wr_is_comment = '0' ";
+    } else if ($not_comment === '0') {
+        $str .= " and wr_is_comment = '1' ";
+    }
 
     return $str;
 }
@@ -832,23 +849,33 @@ function get_group($gr_id, $is_cache=false)
 }
 
 
-// 회원 정보를 얻는다.
-function get_member($mb_id, $fields='*', $is_cache=false)
+/**
+ * 회원 정보를 얻는다
+ * 
+ * @param string $mb_id
+ * @param string $fields
+ * @param bool $is_cache
+ * 
+ * @return array
+ */
+function get_member($mb_id, $fields = '*', $is_cache = false)
 {
     global $g5;
-    
-    if (preg_match("/[^0-9a-z_]+/i", $mb_id))
+
+    $mb_id = trim($mb_id);
+    if (preg_match("/[^0-9a-z_]+/i", $mb_id)) {
         return array();
+    }
 
     static $cache = array();
 
     $key = md5($fields);
 
-    if( $is_cache && isset($cache[$mb_id]) && isset($cache[$mb_id][$key]) ){
+    if ($is_cache && isset($cache[$mb_id]) && isset($cache[$mb_id][$key])) {
         return $cache[$mb_id][$key];
     }
 
-    $sql = " select $fields from {$g5['member_table']} where mb_id = TRIM('$mb_id') ";
+    $sql = " SELECT {$fields} from {$g5['member_table']} where mb_id = '{$mb_id}' ";
 
     $cache[$mb_id][$key] = run_replace('get_member', sql_fetch($sql), $mb_id, $fields, $is_cache);
 
@@ -1319,6 +1346,10 @@ function delete_point($mb_id, $rel_table, $rel_id, $rel_action)
                       and po_rel_id = '$rel_id'
                       and po_rel_action = '$rel_action' ";
         $row = sql_fetch($sql);
+
+        if (! (isset($row['po_id']) && $row['po_id'])) {
+            return true;
+        }
 
         if(isset($row['po_point']) && $row['po_point'] < 0) {
             $mb_id = $row['mb_id'];
@@ -3592,6 +3623,13 @@ function login_password_check($mb, $pass, $hash)
     }
 
     return check_password($pass, $hash);
+}
+
+function safe_filter_url_host($url) {
+
+    $regex = run_replace('safe_filter_url_regex', '\\', $url);
+
+    return $regex ? preg_replace('#'. preg_quote($regex, '#') .'#iu', '', $url) : '';
 }
 
 // 동일한 host url 인지
