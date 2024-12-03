@@ -29,6 +29,10 @@ for ($i=0; $i<$ext_cnt; $i++) {
 }
 //==========================================================================================================================
 
+// Cloudflare 사용시 REMOTE_ADDR 에 사용자 IP 적용과 https 사용 여부
+if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+    include_once('cloudflare.check.php');    // cloudflare 의 ip 대역인지 체크
+}
 
 function g5_path()
 {
@@ -60,16 +64,6 @@ unset($g5_path);
 // IIS 에서 SERVER_ADDR 서버변수가 없다면
 if (!isset($_SERVER['SERVER_ADDR'])) {
     $_SERVER['SERVER_ADDR'] = isset($_SERVER['LOCAL_ADDR']) ? $_SERVER['LOCAL_ADDR'] : '';
-}
-
-// Cloudflare 환경을 고려한 https 사용여부
-if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === "https") {
-    $_SERVER['HTTPS'] = 'on';
-}
-
-// Cloudflare 사용시 REMOTE_ADDR 에 사용자 IP 적용
-if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-    $_SERVER['REMOTE_ADDR'] = preg_replace('/[^0-9.]/', '', $_SERVER['HTTP_CF_CONNECTING_IP']);
 }
 
 // multi-dimensional array에 사용자지정 함수적용
